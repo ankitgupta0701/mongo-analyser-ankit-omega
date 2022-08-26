@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { LogStreamer } from "./services/LogStreamer.service";
+import { ResourceAssessmentService } from "./services/resource-assessment.service";
 
 const chalk = require('chalk');
 const clear = require('clear');
@@ -29,7 +30,7 @@ const argv = require('yargs/yargs')(hideBin(process.argv))
         alias: 'l', describe: 'Limit the number of output rows', type: 'number', default: 100
     })
     .options('log-file', {
-        alias: 'f', describe: 'Full Log file path to analyse', demandOption: true, type: 'string'
+        alias: 'f', describe: 'Full Log file path to analyse', demandOption: false, type: 'string'
     })
     .options('page-size', {
         alias: 'p', describe: 'Page size of HTML table in report', default: 50, type: 'number'
@@ -37,9 +38,22 @@ const argv = require('yargs/yargs')(hideBin(process.argv))
     .options('slow-ms', {
         alias: 's', describe: 'Slow MS Threshold for Query Profiling', default: 100, type: 'number'
     })
+    .options('working-set', {
+        alias: 'w', describe: 'Assess the working set requirements', demandOption: false, type: 'string'
+    })
     .help('help').argv
 
 // logFilePath: string, isGrouped: boolean, limit: number,
 // uiPageSize: number, slowMs: number
-const logStreamer = new LogStreamer(argv.f, argv.g, argv.l, argv.p, argv.s);
-logStreamer.stream();
+if (argv.f)
+{
+    const logStreamer = new LogStreamer(argv.f, argv.g, argv.l, argv.p, argv.s);
+    logStreamer.stream();
+}
+
+if (argv.w)
+{
+    const resourceAssessment = new ResourceAssessmentService(argv.w);
+    resourceAssessment.initialize()
+
+}
